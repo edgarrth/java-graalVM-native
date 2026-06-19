@@ -98,7 +98,7 @@ mvn spring-boot:run
 Probar endpoint:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/payments/authorizations \
+curl -X POST http://localhost:8099/api/v1/payments/authorizations \
   -H 'Content-Type: application/json' \
   -d '{
     "merchantId":"mrc_demo_001",
@@ -130,8 +130,10 @@ mvn clean -Pnative -DskipTests package
 
 ```bash
 mvn clean package -DskipTests
+
 docker build -f infraestructura/Dockerfile.jvm -t payment-native-poc:0.1.0-jvm .
-docker run --rm -p 8080:8080 \
+
+docker run --rm -p 8099:8099 \
   --network host \
   -e DB_URL=jdbc:postgresql://localhost:5432/payments \
   -e DB_USER=payments \
@@ -163,13 +165,13 @@ Para Minikube:
 eval $(minikube docker-env)
 docker build -f infraestructura/Dockerfile.native -t payment-native-poc:0.1.0-native .
 kubectl apply -f infraestructura/k8s/
-kubectl -n payment-poc port-forward svc/payment-native-poc 8080:8080
+kubectl -n payment-poc port-forward svc/payment-native-poc 8099:8099
 ```
 
 Probar:
 
 ```bash
-curl http://localhost:8080/actuator/health
+curl http://localhost:8099/actuator/health
 ```
 
 ## Contrato REST
@@ -186,34 +188,25 @@ curl http://localhost:8080/actuator/health
 }
 ```
 
-### Response
-
-```json
-{
-  "paymentId": "6f59d25d-0282-4e2b-a5b2-e8d0f3f94a91",
-  "status": "AUTHORIZED",
-  "authorizationCode": "AUTH-1A2B3C4D",
-  "amount": 125.50,
-  "currency": "PEN",
-  "createdAt": "2026-06-18T20:10:00.000-05:00"
-}
-```
-
 ## Instalar GraalVM
 
+```bash
 wget https://download.oracle.com/graalvm/25/latest/graalvm-jdk-25_linux-x64_bin.tar.gz
+
 tar -xzf graalvm-jdk-25_linux-x64_bin.tar.gz
+
 sudo mv graalvm-jdk-25* /opt/graalvm
+```
 
+```bash
 nano ~/.bashrc
+
 export JAVA_HOME=/opt/graalvm
+
 export JAVA_HOME=/opt/graalvm/graalvm-jdk-25.0.3+9.1
+
 export PATH=$JAVA_HOME/bin:$PATH
+```
 
-## Notas de diseño
-
-- Se usa PostgreSQL porque la PoC requiere idempotencia y persistencia transaccional del pago.
-- Se usa Redpanda como broker Kafka-compatible para evitar Zookeeper y simplificar la infraestructura local.
-- La capa de dominio no depende de Spring ni de infraestructura.
-- Los puertos definen contratos de aplicación; los adaptadores resuelven detalles técnicos.
+## Notas
 - Flyway crea tablas al iniciar la app; `datasets` carga datos de referencia al iniciar PostgreSQL por primera vez.

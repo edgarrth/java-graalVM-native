@@ -1,0 +1,8 @@
+{
+  "paymentId": "6f59d25d-0282-4e2b-a5b2-e8d0f3f94a91",
+  "status": "AUTHORIZED",
+  "authorizationCode": "AUTH-1A2B3C4D",
+  "amount": 125.50,
+  "currency": "PEN",
+  "createdAt": "2026-06-18T20:10:00.000-05:00"
+}

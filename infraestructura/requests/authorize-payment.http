@@ -1,0 +1,23 @@
+### Autorizar pago exitoso
+POST http://localhost:8080/api/v1/payments/authorizations
+Content-Type: application/json
+
+{
+  "merchantId": "mrc_demo_001",
+  "paymentMethodToken": "tok_visa_4242",
+  "amount": 125.50,
+  "currency": "PEN",
+  "idempotencyKey": "idem-{{$uuid}}"
+}
+
+### Reintento idempotente: usa el mismo idempotencyKey para obtener el mismo pago
+POST http://localhost:8080/api/v1/payments/authorizations
+Content-Type: application/json
+
+{
+  "merchantId": "mrc_demo_001",
+  "paymentMethodToken": "tok_visa_4242",
+  "amount": 125.50,
+  "currency": "PEN",
+  "idempotencyKey": "idem-fixed-001"
+}

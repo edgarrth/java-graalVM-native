@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: payment-poc
+data:
+  DB_URL: jdbc:postgresql://postgres:5432/payments
+  DB_USER: payments
+  KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+  PAYMENT_EVENTS_TOPIC: payment-events

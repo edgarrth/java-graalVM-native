@@ -1,0 +1,10 @@
+FROM ghcr.io/graalvm/native-image-community:25 AS builder
+WORKDIR /workspace
+COPY . .
+RUN ./mvnw -Pnative -DskipTests package || mvn -Pnative -DskipTests package
+
+FROM debian:bookworm-slim
+WORKDIR /app
+COPY --from=builder /workspace/target/payment-native-poc /app/payment-native-poc
+EXPOSE 8080
+ENTRYPOINT ["/app/payment-native-poc"]

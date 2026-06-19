@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: payment-native-poc, namespace: payment-poc }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: payment-native-poc } }
+  template:
+    metadata: { labels: { app: payment-native-poc } }
+    spec:
+      containers:
+        - name: payment-native-poc
+          image: payment-native-poc:0.1.0-native
+          imagePullPolicy: IfNotPresent
+          ports: [{ containerPort: 8080 }]
+          envFrom:
+            - configMapRef: { name: payment-config }
+            - secretRef: { name: payment-secret }
+          readinessProbe:
+            httpGet: { path: /actuator/health, port: 8080 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata: { name: payment-native-poc, namespace: payment-poc }
+spec:
+  selector: { app: payment-native-poc }
+  ports: [{ port: 8080, targetPort: 8080 }]
